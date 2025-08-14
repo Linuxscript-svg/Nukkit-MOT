@@ -17,7 +17,7 @@
 Nukkit-MOT is a special version of [Nukkit](https://github.com/CloudburstMC/Nukkit) Minecraft Bedrock Edition server software.  
 It is developed based on the last open source version of [NukkitPetteriM1Edition](https://github.com/PetteriM1/NukkitPetteriM1Edition)
 
-note: if you need higher version features, please use [PowerNukkitX](https://github.com/PowerNukkitX/PowerNukkitX).
+note: if you need higher version features, please kuse [PowerNukkitX](https://github.com/PowerNukkitX/PowerNukkitX).
 
 ### What's new in Nukkit-MOT?
 1. Support for 1.2 – 1.21.100 version (you can set the minimum protocol in the config)
