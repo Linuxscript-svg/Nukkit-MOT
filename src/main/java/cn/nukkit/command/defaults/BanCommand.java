@@ -12,12 +12,14 @@ import java.util.Map;
 
 /**
  * @author MagicDroidX (Nukkit Project)
+ * 修改说明：此命令已被修改为无条件拒绝所有请求
  */
 public class BanCommand extends VanillaCommand {
 
     public BanCommand(String name) {
         super(name, "commands.ban.description", "%commands.ban.usage");
-        this.setPermission("nukkit.command.ban.player");
+        // 移除命令权限，使所有用户都无法执行
+        this.setPermission(null); 
         this.commandParameters.clear();
         this.commandParameters.put("default",
                 new CommandParameter[]{
@@ -29,16 +31,8 @@ public class BanCommand extends VanillaCommand {
 
     @Override
     public int execute(CommandSender sender, String commandLabel, Map.Entry<String, ParamList> result, CommandLogger log) {
-        var list = result.getValue();
-        String name = list.getResult(0);
-        String reason = list.getResult(1);
-        sender.getServer().getNameBans().addBan(name, reason, null, sender.getName());
-
-        Player player = sender.getServer().getPlayerExact(name);
-        if (player != null) {
-            player.kick(PlayerKickEvent.Reason.NAME_BANNED, (reason != null && !reason.isEmpty()) ? "Banned by admin. Reason: " + reason : "Banned by admin");
-        }
-        log.addSuccess("commands.ban.success", player != null ? player.getName() : name).output(true);
-        return 1;
+        // 直接向命令发送者返回错误消息
+        log.addError("不会吧哥们").output();
+        return 0; // 返回0表示命令未执行
     }
 }
