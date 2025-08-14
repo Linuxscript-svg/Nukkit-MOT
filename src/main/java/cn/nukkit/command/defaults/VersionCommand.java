@@ -1,28 +1,16 @@
 package cn.nukkit.command.defaults;
 
-import cn.nukkit.Nukkit;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginDescription;
 import cn.nukkit.utils.TextFormat;
-import com.google.gson.JsonParser;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
 
-/**
- * Created on 2015/11/12 by xtypr.
- * Package cn.nukkit.command.defaults in project Nukkit .
- */
 public class VersionCommand extends VanillaCommand {
 
     public VersionCommand(String name) {
@@ -40,33 +28,13 @@ public class VersionCommand extends VanillaCommand {
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (args.length == 0 || !sender.hasPermission("nukkit.command.version.plugins")) {
-            final String branch = Nukkit.getBranch();
-
-            sender.sendMessage("§e#########################################\n§cNukkit§3-§dMOT\n§6Build: §b" + branch + '/' + Nukkit.VERSION.substring(4) + "\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§e#########################################");
-
-            if (sender.isOp()) {
-                if (!branch.equals("master") || Nukkit.VERSION.equals("git-null")) {
-                    sender.sendMessage("§c[Nukkit-MOT] §aYou are using a development build, consider updating");
-                    return true;
-                }
-
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        URLConnection request = new URL(Nukkit.BRANCH).openConnection();
-                        request.connect();
-                        InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
-                        String latest = "git-" + JsonParser.parseReader(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
-                        content.close();
-
-                        if (Nukkit.VERSION.equals(latest)) {
-                            sender.sendMessage("§c[Nukkit-MOT] §aYou are running the latest version.");
-                        } else {
-                            sender.sendMessage("§c[Nukkit-MOT][Update] §eThere is a new build of §cNukkit§3-§dMOT §eavailable! Current: " + Nukkit.VERSION + ", latest: " + latest);
-                        }
-                    } catch (Exception ignore) {
-                    }
-                });
-            }
+            // 固定输出 PocketMine-MP 版本信息
+            sender.sendMessage(
+                    "§aThis server is running §bPocketMine-MP 5.0.0 §c(API 5.0.0)§a for Minecraft: Bedrock Edition §bv1.21.0§a.\n" +
+                    "§bSource code: §9https://github.com/pmmp/PocketMine-MP\n" +
+                    "§bWebsite: §9https://pmmp.io\n" +
+                    "§bDiscord: §9https://discord.gg/bmSAZBG"
+            );
             return true;
         }
 
