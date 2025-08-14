@@ -1234,11 +1234,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.spawned = true;
+        
+PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
+        new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{this.displayName})
+);
 
-        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
-                new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{this.displayName})
-        );
-
+// 调用事件后向玩家发送消息
+this.server.getPluginManager().callEvent(playerJoinEvent);
+if (!playerJoinEvent.isCancelled()) {
+    // 向新玩家发送QQ群和网站信息
+    this.sendMessage(
+        TextFormat.GOLD + "Welcome to the server!\n" +
+        TextFormat.GREEN + "Official QQ group: " + TextFormat.AQUA + "1056666012\n" +
+        TextFormat.GREEN + "Website: " + TextFormat.AQUA + "https://mc.rootes.top"
+    );
+}
         this.server.getPluginManager().callEvent(playerJoinEvent);
 
         if (!playerJoinEvent.getJoinMessage().toString().isBlank()) {
@@ -7761,3 +7771,4 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.lockMovementInput;
     }
 }
+
