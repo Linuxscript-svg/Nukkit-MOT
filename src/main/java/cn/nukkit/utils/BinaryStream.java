@@ -318,16 +318,16 @@ public class BinaryStream {
         return Binary.readUUID(this.get(16));
     }
 
-    public void putSkin(Skin skin) {
+    public void putSkin(boolean isNetease, Skin skin) {
         Server.mvw("BinaryStream#putSkin(Skin)");
-        this.putSkin(ProtocolInfo.CURRENT_PROTOCOL, skin);
+        this.putSkin(isNetease, ProtocolInfo.CURRENT_PROTOCOL, skin);
     }
 
     private static byte[] steveSkinDecoded;
 
-    public void putSkin(int protocol, Skin skin) {
+    public void putSkin(boolean isNetease, int protocol, Skin skin) {
         this.putString(skin.getSkinId());
-
+        boolean finalPersona = isNetease ? true : skin.isPersona();
         if (protocol < ProtocolInfo.v1_13_0) {
             if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
                 this.putByteArray(steveSkinDecoded != null ? steveSkinDecoded : (steveSkinDecoded = Base64.getDecoder().decode(Skin.STEVE_SKIN)));
@@ -370,7 +370,7 @@ public class BinaryStream {
             this.putString(skin.getAnimationData());
             if (protocol < ProtocolInfo.v1_17_30) {
                 this.putBoolean(skin.isPremium());
-                this.putBoolean(skin.isPersona());
+                this.putBoolean(finalPersona);
                 this.putBoolean(skin.isCapeOnClassic());
             }
             this.putString(skin.getCapeId());
@@ -402,7 +402,7 @@ public class BinaryStream {
 
                 if (protocol >= ProtocolInfo.v1_17_30) {
                     this.putBoolean(skin.isPremium());
-                    this.putBoolean(skin.isPersona());
+                    this.putBoolean(finalPersona);
                     this.putBoolean(skin.isCapeOnClassic());
                     this.putBoolean(skin.isPrimaryUser());
                     if (protocol >= ProtocolInfo.v1_19_63) {
