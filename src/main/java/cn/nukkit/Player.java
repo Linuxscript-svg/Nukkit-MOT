@@ -1234,21 +1234,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.spawned = true;
-        
-PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
-        new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{this.displayName})
-);
 
-// 调用事件后向玩家发送消息
-this.server.getPluginManager().callEvent(playerJoinEvent);
-if (!playerJoinEvent.isCancelled()) {
-    // 向新玩家发送QQ群和网站信息
-    this.sendMessage(
-        TextFormat.GOLD + "Welcome to the server!\n" +
-        TextFormat.GREEN + "Official QQ group: " + TextFormat.AQUA + "1056666012\n" +
-        TextFormat.GREEN + "Website: " + TextFormat.AQUA + "https://mc.rootes.top"
-    );
-}
+        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
+                new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{this.displayName})
+        );
+
         this.server.getPluginManager().callEvent(playerJoinEvent);
 
         if (!playerJoinEvent.getJoinMessage().toString().isBlank()) {
@@ -2934,7 +2924,7 @@ if (!playerJoinEvent.isCancelled()) {
                 startGamePacket.lightningLevel = this.getLevel().getThunderTime();
             }
         }
-        startGamePacket.isMovementServerAuthoritative = this.isMovementServerAuthoritative();
+        startGamePacket.authoritativeMovementMode = this.getAuthoritativeMovementMode();
         startGamePacket.isServerAuthoritativeBlockBreaking = this.isServerAuthoritativeBlockBreaking();
         startGamePacket.playerPropertyData = EntityProperty.getPlayerPropertyCache();
         this.forceDataPacket(startGamePacket, null);
@@ -5309,8 +5299,25 @@ if (!playerJoinEvent.isCancelled()) {
         this.dataPacket(pk);
     }
 
+    @Deprecated
     public void sendPopup(String message, String subtitle) {
         this.sendPopup(message);
+    }
+
+    public void sendPopupJukebox(String message) {
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_JUKEBOX_POPUP;
+        pk.message = message;
+        this.dataPacket(pk);
+    }
+
+    public void sendPopupJukebox(String message, String[] parameters, boolean isLocalized) {
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_JUKEBOX_POPUP;
+        pk.message = message;
+        pk.parameters = parameters;
+        pk.isLocalized = isLocalized;
+        this.dataPacket(pk);
     }
 
     public void sendTip(String message) {
@@ -7528,7 +7535,17 @@ if (!playerJoinEvent.isCancelled()) {
     }
 
     public boolean isMovementServerAuthoritative() {
-        return this.server.serverAuthoritativeMovementMode == 1 && this.protocol >= ProtocolInfo.v1_17_0;
+        return this.getAuthoritativeMovementMode() != AuthoritativeMovementMode.CLIENT;
+    }
+
+    public AuthoritativeMovementMode getAuthoritativeMovementMode() {
+        if (this.protocol >= ProtocolInfo.v1_21_90) {
+            return AuthoritativeMovementMode.SERVER_WITH_REWIND;
+        }
+        if (this.protocol < ProtocolInfo.v1_17_0) {
+            return AuthoritativeMovementMode.CLIENT;
+        }
+        return AuthoritativeMovementMode.values()[this.server.serverAuthoritativeMovementMode];
     }
 
     public boolean isServerAuthoritativeBlockBreaking() {
@@ -7771,4 +7788,3 @@ if (!playerJoinEvent.isCancelled()) {
         return this.lockMovementInput;
     }
 }
-
